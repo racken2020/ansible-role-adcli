@@ -1,0 +1,128 @@
+- name: Install packages
+  yum:
+    name:
+      - rkhunter
+      - ksh
+      - adcli
+      - sssd
+      - authconfig
+      - krb5-workstation
+      - oddjob-mkhomedir
+      - sssd-tools
+    state: latest
+
+- name: Delete existing keytab
+  file:
+    path: /etc/krb5.keytab
+    state: deleted
+  ignore_errors: yes
+
+- name: Wipe existing resolv.conf
+  copy:
+    content: ''
+    dest: /etc/resolv.conf
+
+- name: Create resolv.conf
+  blockinfile:
+    path: /etc/resolv.conf
+    marker: "###...{mark} adcli {mark}...###"
+    block: |
+      domain {{ ad_domain }}
+      nameserver {{ ad_dc1 }}
+      nameserver {{ ad_dc2 }}
+
+- name: Create parent home directory for ad users
+  file:
+    state: directory
+    path: "/home/{{ ad_domain }}"
+    mode: 0755
+
+- name: Wipe existing krb5.conf
+  copy:
+    content: ''
+    dest: /etc/krb5.conf
+    backup: yes
+
+- name: Create krb5.conf
+  blockinfile:
+    path: /etc/krb5.conf
+    marker: "###...{mark} adcli {mark}...###"
+    block: |
+      [libdefaults]
+      rdns = false
+      default_realm = {{ ad_domain|upper }}
+      dns_lookup_realm = true
+      dns_lookup_kdc = true
+      ticket_lifetime = 24h
+      renew_lifetime = 7d
+      forwardable = true
+
+- name: Join AD
+  shell: echo '{{ ad_joinpw }}' | adcli join --verbose --domain={{ ad_domain|upper }} -U {{ ad_joinusr }} --computer-name={{ ad_netbios_name | default(inventory_hostname) }} --stdin-password 2>&1 | tee /var/log/adcli.log
+
+- name: Run authconfig
+  shell: authconfig --enablesssd --enablesssdauth --enablemkhomedir --update
+
+- name: Wipe existing sssd.conf
+  copy:
+    content: ''
+    dest: /etc/sssd/sssd.conf
+    backup: yes
+
+- name: Create sssd.conf
+  blockinfile:
+    path: /etc/sssd/sssd.conf
+    mode: 0600
+    marker: "###...{mark} adcli {mark}...###"
+    block: |
+      [sssd]
+      services = nss, pam, ssh, autofs
+      config_file_version = 2
+      domains = {{ ad_domain|upper }}
+      [nss]
+      filter_groups = dpadmin
+      [domain/{{ ad_domain|upper }}]
+      id_provider = ad
+      default_shell = /bin/bash
+      override_homedir = /home/%u
+      create_homedir = true
+      homedir_umask = 077
+      use_fully_qualified_names = false
+      ad_hostname = "{{ ad_netbios_name }}$"
+
+- name: Start sssd service
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+  - sssd
+  - oddjobd
+
+- name: Enable password auth on sshd
+  replace:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication.*$'
+    replace: 'PasswordAuthentication yes'
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: Add client group to sudoers
+  lineinfile:
+    path: /etc/sudoers.d/ad_sudoers
+    line: '%{{ ad_sudoers_group }} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    create: yes
+  when: ad_sudoers_group != ""
+
+- name: Check if {{ ad_joinusr }}@{{ ad_domain }} exists
+  shell: id {{ ad_joinusr }}@{{ ad_domain }}
+  register: idOut
+
+- debug:
+    var: idOut.stdout_lines
+
+
