@@ -37,3 +37,10 @@ Writes adcli output to /var/log/adcli.log
 a-hostname-with-more-than-15-characters ansible_host=192.168.1.101 ad_netbios_name=shorterMe
 ```
 
+
+## Pre-checks
+Check that the target machines have access to AD controller on these ports: 53, 88, 389, 445. e.g.
+```
+nmap -p53,88,389,445 <ad controller ip>
+```
+
