@@ -44,3 +44,10 @@ Check that the target machines have access to AD controller on these ports: 53, 
 nmap -p53,88,389,445 <ad controller ip>
 ```
 
+
+## Adding this as a git submodule to your ansible home
+```
+git submodule add https://xpk.headdesk.me/git/xpk/role.adcli.git roles/adcli
+git commit -S -m 'SUB: adcli submodule'
+git push
+```
