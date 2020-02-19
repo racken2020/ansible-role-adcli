@@ -17,6 +17,8 @@ Writes adcli output to /var/log/adcli.log
 - ad_netbios_name (note this is a host variable, useful when hostname is longer than the netbios limit of 15 characters)
 
 ## Sample playbook utilizing this role
+Here variables are set in the inventory. One may prefer setting the in group_vars/ so they can be encrypted
+
 ```
 - name: Join stupid AD
   hosts: a-hostname-with-more-than-15-characters
