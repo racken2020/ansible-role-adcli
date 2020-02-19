@@ -88,7 +88,7 @@
           create_homedir = true
           homedir_umask = 077
           use_fully_qualified_names = false
-          ad_hostname = "{{ ad_netbios_name }}$"
+          ad_hostname = "{{ ad_netbios_name | default(inventory_hostname) }}"
 
 - name: Start sssd service
   service:
