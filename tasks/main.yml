@@ -114,6 +114,7 @@
     line: '%{{ ad_sudoers_group }} ALL=(ALL) NOPASSWD: ALL'
     state: present
     create: yes
+    validate: visudo -cf %s
   when: ad_sudoers_group is defined
 
 - name: Check if {{ ad_joinusr }}@{{ ad_domain }} exists
