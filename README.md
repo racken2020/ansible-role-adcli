@@ -5,12 +5,12 @@ Note that ad_netbios_name will default to inventory hostname if not supplied. Th
 
 Writes adcli output to /var/log/adcli.log
 
-## Required variables:
-- ad_domain 
-- ad_dc1
-- ad_dc2
-- ad_joinusr
-- ad_joinpw
+## Set required variables in group_vars/all.yml
+ad_domain: some-domain.tld
+ad_dc1: 1.2.3.4
+ad_dc2: 2.3.4.5
+ad_joinusr: adjoin
+ad_joinpw: xxx
 
 ## Optional variable:
 - ad_sudoers_group
@@ -25,13 +25,6 @@ Here variables are set in the inventory. One may prefer setting the in group_var
   become: yes
   roles:
     - role: adcli
-      vars:
-        - ad_domain: foo.local
-        - ad_dc1: 192.168.1.10
-        - ad_dc2: 192.168.1.11
-        - ad_joinusr: adjoin
-        - ad_joinpw: adjoin-password
-        - ad_sudoers_group: linuxadmins
 ```
 
 ## Sample inventory
@@ -39,13 +32,16 @@ Here variables are set in the inventory. One may prefer setting the in group_var
 a-hostname-with-more-than-15-characters ansible_host=192.168.1.101 ad_netbios_name=shorterMe
 ```
 
-
 ## Pre-checks
 Check that the target machines have access to AD controller on these ports: 53, 88, 389, 445. e.g.
 ```
 nmap -p53,88,389,445 <ad controller ip>
 ```
 
+Do a lookup for the SRV records
+```
+host -tsrv _ldap._tcp.dc._msdcs.DOMAIN <DC IP>
+```
 
 ## Adding this as a git submodule to your ansible home
 ```

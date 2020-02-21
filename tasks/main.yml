@@ -1,8 +1,6 @@
 - name: Install packages
   yum:
     name:
-      - rkhunter
-      - ksh
       - adcli
       - sssd
       - authconfig
