@@ -12,7 +12,7 @@
 - name: Delete existing keytab
   file:
     path: /etc/krb5.keytab
-    state: deleted
+    state: absent
   ignore_errors: yes
 
 - name: Wipe existing resolv.conf
