@@ -56,7 +56,7 @@
           forwardable = true
 
 - name: Join AD
-  shell: echo '{{ ad_joinpw }}' | adcli join --verbose --domain={{ ad_domain|upper }} -U {{ ad_joinusr }} --computer-name={{ ad_netbios_name | default(inventory_hostname).split(".")[0] }} --stdin-password 2>&1 | tee /var/log/adcli.log
+  shell: echo '{{ ad_joinpw }}' | adcli join --verbose --domain={{ ad_domain|upper }} -U {{ ad_joinusr }} --computer-name={{ ad_netbios_name | ansible_nodename.split(".")[0] }} --stdin-password 2>&1 | tee /var/log/adcli.log
 
 - name: Run authconfig
   shell: authconfig --enablesssd --enablesssdauth --enablemkhomedir --update
