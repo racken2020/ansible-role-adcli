@@ -6,11 +6,13 @@ Note that ad_netbios_name will default to inventory hostname if not supplied. Th
 Writes adcli output to /var/log/adcli.log
 
 ## Set required variables in group_vars/all.yml
+```
 ad_domain: some-domain.tld
 ad_dc1: 1.2.3.4
 ad_dc2: 2.3.4.5
 ad_joinusr: adjoin
 ad_joinpw: xxx
+```
 
 ## Optional variable:
 - ad_sudoers_group
