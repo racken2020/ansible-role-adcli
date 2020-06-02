@@ -1,5 +1,5 @@
 # Ansible role for joining AD with adcli
-URL: https://xpk.headdesk.me/git/xpk/role.adcli.git
+URL: https://github.com/racken2020/ansible-role-adcli.git
 
 Note that ad_netbios_name will default to inventory hostname if not supplied. That said, hostname must be specified in the inventory file.
 
