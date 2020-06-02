@@ -29,7 +29,7 @@ Here variables are set in the inventory. One may prefer setting the in group_var
     - role: adcli
 ```
 
-## Sample inventory
+## Sample inventory for host specific customisation
 ```
 a-hostname-with-more-than-15-characters ansible_host=192.168.1.101 ad_netbios_name=shorterMe
 ```
@@ -47,7 +47,7 @@ host -tsrv _ldap._tcp.dc._msdcs.DOMAIN <DC IP>
 
 ## Adding this as a git submodule to your ansible home
 ```
-git submodule add https://xpk.headdesk.me/git/xpk/role.adcli.git roles/adcli
+git submodule add https://github.com/racken2020/ansible-role-adcli.git roles/adcli
 git commit -S -m 'SUB: adcli submodule'
 git push
 ```
